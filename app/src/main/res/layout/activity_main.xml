@@ -5,26 +5,145 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/fondo_principal"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- Recordar hacer lo de los idiomas -->
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/verde_profundo"
+        app:title="TreePlayer"
+        app:titleTextColor="@color/white"
+        app:menu="@menu/main_menu"
+        app:navigationIcon="@drawable/ic_menu_xml"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button"
-        android:onClick="hola"
+    <!-- Título de la sección -->
+    <TextView
+        android:id="@+id/tvTituloLista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        android:text="Tus Canciones"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/texto_primario_dark"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="441dp" />
+        app:layout_constraintTop_toBottomOf="@+id/topAppBar" />
+
+    <!-- Contador de canciones -->
+    <TextView
+        android:id="@+id/tvContador"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="24 (por areglar)"
+        android:textSize="14sp"
+        android:textColor="@color/texto_secundario_dark"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTituloLista"
+        app:layout_constraintTop_toTopOf="@+id/tvTituloLista" />
+
+    <!-- Lista de canciones (RecyclerView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCanciones"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:paddingHorizontal="12dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/tvTituloLista"
+        app:layout_constraintBottom_toTopOf="@+id/playerBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Barra inferior del reproductor (siempre visible) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/playerBar"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/superficie_tarjeta"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp">
+
+            <!-- Portada miniatura -->
+            <ImageView
+                android:id="@+id/ivMiniPortada"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_default_album"
+                android:scaleType="centerCrop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize8" />
+
+            <!-- Info canción -->
+            <TextView
+                android:id="@+id/tvMiniTitulo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Poner el nombre de la canción :)"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/texto_primario_dark"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toEndOf="@+id/ivMiniPortada"
+                app:layout_constraintEnd_toStartOf="@+id/btnMiniPlay"
+                app:layout_constraintTop_toTopOf="@+id/ivMiniPortada"
+                app:layout_constraintBottom_toTopOf="@+id/tvMiniArtista" />
+
+            <TextView
+                android:id="@+id/tvMiniArtista"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Nombre del artista (por arreglar)"
+                android:textSize="12sp"
+                android:textColor="@color/texto_secundario_dark"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toEndOf="@+id/ivMiniPortada"
+                app:layout_constraintEnd_toStartOf="@+id/btnMiniPlay"
+                app:layout_constraintTop_toBottomOf="@+id/tvMiniTitulo"
+                app:layout_constraintBottom_toBottomOf="@+id/ivMiniPortada" />
+
+            <!-- Botón Play/Pause -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMiniPlay"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:icon="@drawable/ic_play"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:backgroundTint="@color/verde_brillante"
+                app:iconTint="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,4 +2,32 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- colores base -->
+    <color name="verde_brillante">#5ab267</color>
+    <color name="verde_agua">#8cd96b</color>
+    <color name="marron_oscuro">#a34f3e</color>
+    <color name="marrón_claro">#c86e59</color>
+    <color name="verde_profundo">#288c64</color>
+    <color name="marrón_raiz">#873f2e</color>
+
+    <!-- Tema oscuro -->
+    <color name="fondo_principal">#121714</color>
+    <color name="superficie_tarjeta">#1E2A22</color>
+    <color name="color_primario">#5ab267</color>
+    <color name="color_primario_variante">#288c64</color>
+    <color name="color_secundario">#c86e59</color>
+
+    <!-- Textos Oscuros -->
+    <color name="texto_primario_dark">#FFFFFF</color>
+    <color name="texto_secundario_dark">#B3FFFFFF</color>
+
+    <!--Tema claro -->
+    <color name="fondo_principal_light">#F5F9F2</color>
+    <color name="superficie_tarjeta_light">#FFFFFF</color>
+    <color name="texto_primario_light">#1A1F1A</color>
+    <color name="texto_secundario_light">#6B756B</color>
+
+    <!-- Sombra para elevation en light theme -->
+    <color name="sombra_light">#1A000000</color>
 </resources>
