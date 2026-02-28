@@ -6,42 +6,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fondo_principal"
-    tools:context=".MainActivity">
+    tools:context=".views.MainActivity">
 
     <!-- Recordar hacer lo de los idiomas -->
-
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/verde_profundo"
-        app:title="TreePlayer"
-        app:titleTextColor="@color/white"
         app:menu="@menu/main_menu"
-        app:navigationIcon="@drawable/ic_menu_xml"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:titleTextColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        >
 
-    <!-- Título de la sección -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start">
+
+            <!-- Sí, esto se puede ahcer y no me acordaba que lo había hecho abajo :) -->
+            <!-- Imagen a la izquierda del nombre de la app -->
+            <ImageView
+                android:id="@+id/toolBarIco"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_default_album_final"
+                android:scaleType="centerCrop"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize8" />
+
+            <!-- Título a la derecha de la imagen -->
+            <TextView
+                android:id="@+id/toolbarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="12dp"
+                app:layout_constraintStart_toEndOf="@+id/toolBarIco"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
     <TextView
         android:id="@+id/tvTituloLista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tus Canciones"
+        android:text="@string/main_your_songs"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="@color/texto_primario_dark"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar" />
+        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
+        />
 
     <!-- Contador de canciones -->
     <TextView
         android:id="@+id/tvContador"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="24 (por areglar)"
+        android:text="0"
         android:textSize="14sp"
         android:textColor="@color/texto_secundario_dark"
         android:layout_marginEnd="16dp"
@@ -87,7 +121,7 @@
                 android:id="@+id/ivMiniPortada"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_default_album"
+                android:src="@drawable/ic_default_album_final"
                 android:scaleType="centerCrop"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -99,7 +133,7 @@
                 android:id="@+id/tvMiniTitulo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Poner el nombre de la canción :)"
+                android:text="@string/main_no_song_selected"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/texto_primario_dark"
@@ -116,7 +150,7 @@
                 android:id="@+id/tvMiniArtista"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Nombre del artista (por arreglar)"
+                android:text="@string/app_name"
                 android:textSize="12sp"
                 android:textColor="@color/texto_secundario_dark"
                 android:maxLines="1"

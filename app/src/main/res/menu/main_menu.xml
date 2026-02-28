@@ -3,15 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_search"
-        android:title="Buscar"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/action_language"
+        android:icon="@drawable/ic_language"
+        android:title="@string/language"
+        app:showAsAction="always" />
 
+    <!--
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
-        android:title="Ajustes"
+        android:title="@string/action_settings"
         app:showAsAction="never" />
-
+-->
 </menu>

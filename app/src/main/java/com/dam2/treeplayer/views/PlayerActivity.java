@@ -1,9 +1,8 @@
-package com.dam2.treeplayer;
+package com.dam2.treeplayer.views;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -13,12 +12,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.dam2.treeplayer.R;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.slider.Slider;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import com.dam2.treeplayer.song_logic.PlayerManager;
+import com.dam2.treeplayer.song_logic.Song;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -30,8 +31,7 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView ivPortadaGrande; //Para lo de la API
     private CardView cvPortada; //Para lo de la API
 
-    // MediaPlayer
-    private MediaPlayer mediaPlayer;
+    private PlayerManager playerManager;
     private Handler handler = new Handler();
     private Runnable runnable;
 
@@ -39,22 +39,27 @@ public class PlayerActivity extends AppCompatActivity {
     private boolean isPlaying = false;
     private boolean isShuffle = false;
     private boolean isRepeat = false;
+    private boolean isUpdatingSeekBar = false;
+
     private int currentVolume = 10;
     private int maxVolume = 100;
+    private int currentPosition = 0;
 
     // Datos de la canción (luego tengo que ponerlos con un intent)
     private String songTitle = "Nombre de la canción"; //Por ahora no tengo canciones, así que así se queda xd - Recordar que aquí va lo de la API
     private String songArtist = "Nombre del artista"; //APIIIIIIIIIIIIIIIIII
     private int songDuration = 228000; // En milisegundos - 228s - aprox. 3:48 min - Tengo que cambiarlo para que cambie dependiendo de la música xdddddd (API jijiji)
-    private int songResource = R.raw.sample_song; // Archivo en res/raw/  -  Recordar lo del copy y tal
+    private int songResource = R.raw.sample_song_1; // Archivo en res/raw/  -  Recordar lo del copy y tal
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        // Recibir datos del Intent (Tengo que ver cómo lo hago)
-        getIntentData();
+        playerManager = PlayerManager.getInstance(); //Obtenemos la instancia
+
+        // Recibir datos del Intent (Ya no se envían porque lo sacamos a una clase singleton)
+        //getIntentData();
 
         // Inicializar vistas
         initViews();
@@ -62,33 +67,17 @@ public class PlayerActivity extends AppCompatActivity {
         // Configurar listeners
         setupListeners();
 
-        // Inicializar MediaPlayer
-        initMediaPlayer();
-
         // Actualizar UI con datos de la canción
         updateSongInfo();
 
         // Configurar SeekBar de volumen
         setupVolumeSeekBar();
+        setupProgressSeekBar();
 
-        //Probar mientras tanto ;)
-        mediaPlayer = MediaPlayer.create(this, R.raw.sample_song);
-
-        if (mediaPlayer != null) {
-            mediaPlayer.start();
-            Toast.makeText(this, "Reproduciendo canción", Toast.LENGTH_SHORT).show();
+        // Iniciar la actualización de la seekbar si está sonando
+        if (playerManager.isPlaying()) {
+            startUpdatingSeekBar();
         }
-    }
-
-    private void getIntentData() {
-        // Aquí se recibirám los datos de la canción seleccionada en MainActivity - por construir
-
-        /**
-        Ejemplo xd
-        songTitle = getIntent().getStringExtra("song_title");
-        songArtist = getIntent().getStringExtra("song_artist");
-        songDuration = getIntent().getIntExtra("song_duration", 0);
-        */
     }
 
     private void initViews() {
@@ -124,18 +113,21 @@ public class PlayerActivity extends AppCompatActivity {
         btnClose.setOnClickListener(v -> finish());
 
         // Botón menú
-        btnMenu.setOnClickListener(v ->
-                Toast.makeText(PlayerActivity.this, "Menú de opciones", Toast.LENGTH_SHORT).show()
-        );
+        btnMenu.setOnClickListener(v -> {Toast.makeText(PlayerActivity.this, R.string.menu_open, Toast.LENGTH_SHORT).show();});
 
         // Botón Play/Pause
         btnPlayPause.setOnClickListener(v -> {
-            if (isPlaying) {
-                pauseSong();
+            if (playerManager.isPlaying()) {
+                playerManager.pauseSong();
+                btnPlayPause.setIconResource(R.drawable.ic_play);
+                stopUpdatingSeekBar();
             } else {
-                playSong();
+                playerManager.resumeSong();
+                btnPlayPause.setIconResource(R.drawable.ic_pause);
+                startUpdatingSeekBar();
             }
         });
+
 
         // Botón anterior
         btnPrevious.setOnClickListener(v -> previousSong());
@@ -177,18 +169,13 @@ public class PlayerActivity extends AppCompatActivity {
                 btnVolume.setImageResource(R.drawable.ic_volume_off);
             }
             seekVolume.setProgress(currentVolume);
-            if (mediaPlayer != null) {
-                mediaPlayer.setVolume(currentVolume / 100f, currentVolume / 100f);
-            }
         });
 
         // SeekBar de progreso de la canción
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && mediaPlayer != null) {
-                    mediaPlayer.seekTo(progress);
-                    seekBar.setProgress(progress);
+                if (fromUser) {
                     tvTiempoActual.setText(millisecondsToTime(progress));
                 }
             }
@@ -212,9 +199,6 @@ public class PlayerActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     currentVolume = progress;
-                    if (mediaPlayer != null) {
-                        mediaPlayer.setVolume(currentVolume / 100f, currentVolume / 100f);
-                    }
 
                     // Actualizar ícono según volumen
                     if (currentVolume == 0) {
@@ -229,77 +213,92 @@ public class PlayerActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
     private void initMediaPlayer() {
-        try {
-            mediaPlayer = MediaPlayer.create(this, songResource);
-            if (mediaPlayer != null) {
-                mediaPlayer.setLooping(false); // Controlado por isRepeat
-                songDuration = mediaPlayer.getDuration();
-                seekBar.setMax(songDuration);
-                tvDuracionTotal.setText(millisecondsToTime(songDuration));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error al cargar la canción", Toast.LENGTH_SHORT).show();
+
+        seekBar.setMax(songDuration);
+        tvDuracionTotal.setText(millisecondsToTime(songDuration));
+
+        seekBar.setProgress(currentPosition);
+        tvTiempoActual.setText(millisecondsToTime(currentPosition));
+
+        if (isPlaying){
+            btnPlayPause.setIconResource(R.drawable.ic_pause);
+        }else{
+            btnPlayPause.setIconResource(R.drawable.ic_play);
         }
+
+        updateSeekBar();
     }
 
     private void playSong() {
-        if (mediaPlayer != null) {
-            mediaPlayer.start();
-            isPlaying = true;
-            btnPlayPause.setIconResource(R.drawable.ic_pause);
-            updateSeekBar();
-        }
+        isPlaying = true;
+        btnPlayPause.setIconResource(R.drawable.ic_pause);
+        updateSeekBar();
     }
 
     private void pauseSong() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            isPlaying = false;
-            btnPlayPause.setIconResource(R.drawable.ic_play);
-            handler.removeCallbacks(runnable);
-        }
+        isPlaying = false;
+        btnPlayPause.setIconResource(R.drawable.ic_play);
+        handler.removeCallbacks(runnable);
     }
 
     private void previousSong() {
-        // Aquí irá la lógica para canción anterior
+        // Aquí irá la lógica para canción anterior - Falta terminar
         Toast.makeText(this, "Canción anterior", Toast.LENGTH_SHORT).show();
-
-        // Simular cambio de canción
-        if (mediaPlayer != null) {
-            mediaPlayer.seekTo(0);
-            if (!isPlaying) {
-                playSong();
-            }
-        }
     }
 
     private void nextSong() {
-        // Aquí irá la lógica para siguiente canción
+        // Aquí irá la lógica para siguiente canción - Falta terminar
         Toast.makeText(this, "Siguiente canción", Toast.LENGTH_SHORT).show();
-
-        // Simular cambio de canción
-        if (mediaPlayer != null) {
-            mediaPlayer.seekTo(0);
-            if (!isPlaying) {
-                playSong();
-            }
-        }
     }
 
     private void updateSongInfo() {
-        tvTituloCancion.setText(songTitle);
-        tvArtistaCancion.setText(songArtist);
+        Song cancion = playerManager.getCancionActual();
+        if (cancion != null) {
+            tvTituloCancion.setText(cancion.getTitulo());
+            tvArtistaCancion.setText(cancion.getArtista());
+            // Recordar hacer lo de la API
+        }
+    }
 
-        // Recordar poner lo de la API
-        // ivPortadaGrande.setImageResource(songImageResource);
+    private void setupProgressSeekBar() {
+        Song cancion = playerManager.getCancionActual();
+        if (cancion != null) {
+            int duration = playerManager.getDuration();
+            seekBar.setMax(duration);
+            tvDuracionTotal.setText(millisecondsToTime(duration));
+
+            int currentPosition = playerManager.getCurrentPosition();
+            seekBar.setProgress(currentPosition);
+            tvTiempoActual.setText(millisecondsToTime(currentPosition));
+        }
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    tvTiempoActual.setText(millisecondsToTime(progress));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                stopUpdatingSeekBar();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                playerManager.seekTo(seekBar.getProgress());
+                if (playerManager.isPlaying()) {
+                    startUpdatingSeekBar();
+                }
+            }
+        });
     }
 
     private void setupVolumeSeekBar() {
@@ -308,29 +307,59 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void updateSeekBar() {
-        if (mediaPlayer != null) {
-            int currentPosition = mediaPlayer.getCurrentPosition();
-            seekBar.setProgress(currentPosition);
-            tvTiempoActual.setText(millisecondsToTime(currentPosition));
+        handler.removeCallbacks(runnable); // Siempre limpiar primero
 
-            // Verificar si la canción terminó
-            if (mediaPlayer.isPlaying()) {
-                runnable = this::updateSeekBar;
-                handler.postDelayed(runnable, 1000);
-            }
+        if (isPlaying) {
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    int currentPosition = seekBar.getProgress() + 1000;
+                    if (currentPosition < songDuration) {
+                        seekBar.setProgress(currentPosition);
+                        tvTiempoActual.setText(millisecondsToTime(currentPosition));
+                        handler.postDelayed(this, 1000);
+                    } else {
+                        // Llegó al final
+                        seekBar.setProgress(songDuration);
+                        tvTiempoActual.setText(millisecondsToTime(songDuration));
 
-            // Manejar fin de canción
-            mediaPlayer.setOnCompletionListener(mp -> {
-                if (isRepeat) {
-                    // Repetir misma canción
-                    mediaPlayer.seekTo(0);
-                    mediaPlayer.start();
-                } else {
-                    // Pasar a siguiente canción
-                    nextSong();
+                        // Importante: Detener el handler antes de cambiar isPlaying
+                        handler.removeCallbacks(this);
+
+                        isPlaying = false;
+                        btnPlayPause.setIconResource(R.drawable.ic_play);
+
+                        // Opcional: Notificar que terminó
+                        // Toast.makeText(PlayerActivity.this, "Canción finalizada", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            });
+            };
+            handler.postDelayed(runnable, 1000);
         }
+    }
+
+    private void startUpdatingSeekBar() {
+        stopUpdatingSeekBar(); // Asegurarse de que no haya otro corriendo
+        isUpdatingSeekBar = true;
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isUpdatingSeekBar && playerManager.isPlaying()) {
+                    int currentPosition = playerManager.getCurrentPosition();
+                    seekBar.setProgress(currentPosition);
+                    tvTiempoActual.setText(millisecondsToTime(currentPosition));
+                    handler.postDelayed(this, 1000);
+                } else {
+                    stopUpdatingSeekBar();
+                }
+            }
+        };
+        handler.postDelayed(runnable, 1000);
+    }
+
+    private void stopUpdatingSeekBar() {
+        isUpdatingSeekBar = false;
+        handler.removeCallbacks(runnable);
     }
 
     private String millisecondsToTime(int milliseconds) {
@@ -344,32 +373,28 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Pausar la canción si la actividad no está visible
-        if (isPlaying) {
-            pauseSong();
-        }
+        // Liberar recursos del MediaPlayer
+        stopUpdatingSeekBar();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // Liberar recursos del MediaPlayer
-        handler.removeCallbacks(runnable);
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+        stopUpdatingSeekBar();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Reanudar reproducción si estaba sonando
-        if (isPlaying) {
-            playSong();
+        // Al reanudar, actualizar la UI con la canción actual y su estado
+        updateSongInfo();
+        setupProgressSeekBar(); // Vuelve a configurar la seekbar con los valores actuales
+        if (playerManager.isPlaying()) {
+            btnPlayPause.setIconResource(R.drawable.ic_pause);
+            startUpdatingSeekBar();
+        } else {
+            btnPlayPause.setIconResource(R.drawable.ic_play);
         }
     }
 }

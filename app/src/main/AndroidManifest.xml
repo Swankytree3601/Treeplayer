@@ -11,8 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TreePlayer">
+
+        <!-- Se me había olvidado que había que poner las vistas -->
         <activity
-            android:name=".MainActivity"
+            android:name=".views.PlayerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".views.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

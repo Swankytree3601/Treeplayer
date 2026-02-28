@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name" translatable="false">Tree Player</string>
+    <string name="main_your_songs">Tus canciones</string>
+    <string name="main_no_song_selected">Ninguna canción seleccionada</string>
+    <string name="action_chage_language">Buscar</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="language">Idioma</string>
+    <string name="spanish">Español</string>
+    <string name="english">Inglés</string>
+    <string name="select_song_first">Selecciona una canción primero</string>
+    <string name="menu_open">Menú abierto</string>
+    <string name="search">Buscar</string>
+    <string name="settings">Ajustes</string>
+    <string name="canciones">canciones</string>
+</resources>
