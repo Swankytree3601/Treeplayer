@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name" translatable="false">Tree Player</string>
     <string name="main_your_songs">Tus canciones</string>
     <string name="main_no_song_selected">Ninguna canción seleccionada</string>
     <string name="action_chage_language">Buscar</string>
@@ -15,4 +14,7 @@
     <string name="search">Buscar</string>
     <string name="settings">Ajustes</string>
     <string name="canciones">canciones</string>
+    <string name="show_lyric">Mostrar letra</string>
+    <string name="subtittle_lyric">Letra</string>
+    <string name="close_lyrics">Cerrar</string>
 </resources>

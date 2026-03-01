@@ -2,62 +2,70 @@ package com.dam2.treeplayer.song_logic;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-
 import java.io.IOException;
+import java.util.List;
 
 public class PlayerManager {
-    private static PlayerManager instancia;
+    private static PlayerManager instance;
     private MediaPlayer mediaPlayer;
-    private Song cancionActual;
+    private Song currentSong;
     private boolean isPlaying = false;
     private int currentPosition = 0;
+    private List<Song> playlist;
+    private int currentSongIndex = -1;
 
     private PlayerManager() {
         mediaPlayer = new MediaPlayer();
     }
 
     public static PlayerManager getInstance() {
-        if (instancia == null) {
-            instancia = new PlayerManager();
-        }
-        return instancia;
+        if (instance == null) instance = new PlayerManager();
+        return instance;
+    }
+
+    public void setPlaylist(List<Song> playlist) {
+        this.playlist = playlist;
     }
 
     public void playSong(Context context, Song song) {
-        // Si es la misma canción y está en pausa, solo reanudar
-        if (cancionActual != null && cancionActual.equals(song) && mediaPlayer != null) {
+        if (currentSong != null && currentSong.equals(song) && mediaPlayer != null) {
             resumeSong();
             return;
         }
-
-        // Si no, cargar la nueva canción
         try {
             mediaPlayer.reset();
-            // Asumiendo que el recurso es un raw, necesitarías el contexto para abrirlo.
-            // Una mejor práctica sería pasar un FileDescriptor o un URI.
-            // Para este ejemplo, asumimos que el recurso es un raw y usamos create().
-            // PERO create() crea un MediaPlayer nuevo, no reutiliza el nuestro.
-            // Por eso, usaremos setDataSource con el raw.
-            android.content.res.AssetFileDescriptor afd = context.getResources().openRawResourceFd(song.getRecursoRaw());
+            android.content.res.AssetFileDescriptor afd = context.getResources().openRawResourceFd(song.getRawResourceID());
             if (afd != null) {
                 mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 afd.close();
                 mediaPlayer.prepare();
                 mediaPlayer.start();
-                this.cancionActual = song;
+                this.currentSong = song;
                 this.isPlaying = true;
                 this.currentPosition = 0;
 
-                // Listener para cuando la canción termine
+                if (playlist != null) currentSongIndex = playlist.indexOf(song);
+
                 mediaPlayer.setOnCompletionListener(mp -> {
                     this.isPlaying = false;
                     this.currentPosition = 0;
-                    // Aquí podrías notificar a las actividades para que actualicen la UI (ej. cambiar el icono a play)
                 });
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void playNext(Context context) {
+        if (playlist == null || playlist.isEmpty() || currentSongIndex < 0) return;
+        int nextIndex = (currentSongIndex + 1) % playlist.size();
+        playSong(context, playlist.get(nextIndex));
+    }
+
+    public void playPrevious(Context context) {
+        if (playlist == null || playlist.isEmpty() || currentSongIndex < 0) return;
+        int prevIndex = (currentSongIndex - 1 + playlist.size()) % playlist.size();
+        playSong(context, playlist.get(prevIndex));
     }
 
     public void pauseSong() {
@@ -69,7 +77,7 @@ public class PlayerManager {
     }
 
     public void resumeSong() {
-        if (mediaPlayer != null && !mediaPlayer.isPlaying() && cancionActual != null) {
+        if (mediaPlayer != null && !mediaPlayer.isPlaying() && currentSong != null) {
             mediaPlayer.start();
             isPlaying = true;
         }
@@ -78,51 +86,28 @@ public class PlayerManager {
     public void stopSong() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
-            try {
-                mediaPlayer.prepare(); // Para poder volver a empezar
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            try { mediaPlayer.prepare(); } catch (IOException e) { e.printStackTrace(); }
             isPlaying = false;
             currentPosition = 0;
         }
     }
 
     public void seekTo(int position) {
-        if (mediaPlayer != null && cancionActual != null) {
+        if (mediaPlayer != null && currentSong != null) {
             mediaPlayer.seekTo(position);
             currentPosition = position;
         }
     }
 
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
-    public Song getCancionActual() {
-        return cancionActual;
-    }
-
-    public int getCurrentPosition() {
-        if (mediaPlayer != null && isPlaying) {
-            return mediaPlayer.getCurrentPosition();
-        } else {
-            return currentPosition;
-        }
-    }
-
-    public int getDuration() {
-        if (mediaPlayer != null && cancionActual != null) {
-            return mediaPlayer.getDuration();
-        }
-        return 0;
-    }
-
+    public boolean isPlaying() { return isPlaying; }
+    public Song getCurrentSong() { return currentSong; }
+    public int getCurrentPosition() { return (mediaPlayer != null && isPlaying) ? mediaPlayer.getCurrentPosition() : currentPosition; }
+    public int getDuration() { return (mediaPlayer != null && currentSong != null) ? mediaPlayer.getDuration() : 0; }
     public void release() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
-            instancia = null; // Resetear la instancia para la próxima vez
+            instance = null;
         }
     }
 }

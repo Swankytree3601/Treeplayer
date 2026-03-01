@@ -14,6 +14,8 @@
     <!-- Tema oscuro -->
     <color name="fondo_principal">#121714</color>
     <color name="superficie_tarjeta">#1E2A22</color>
+
+    <!-- Colores primarios y secundarios que faltaban -->
     <color name="color_primario">#5ab267</color>
     <color name="color_primario_variante">#288c64</color>
     <color name="color_secundario">#c86e59</color>

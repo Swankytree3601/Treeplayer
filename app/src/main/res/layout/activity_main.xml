@@ -8,176 +8,174 @@
     android:background="@color/fondo_principal"
     tools:context=".views.MainActivity">
 
-    <!-- Recordar hacer lo de los idiomas -->
-    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/verde_profundo"
-        app:menu="@menu/main_menu"
-        app:titleTextColor="@color/white"
         app:layout_constraintTop_toTopOf="parent"
-        >
+        app:titleTextColor="@color/white">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <!-- Sí, esto se puede ahcer y no me acordaba que lo había hecho abajo :) -->
-            <!-- Imagen a la izquierda del nombre de la app -->
             <ImageView
                 android:id="@+id/toolBarIco"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
                 android:src="@drawable/ic_default_album_final"
-                android:scaleType="centerCrop"
-                android:layout_marginStart="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize8" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Título a la derecha de la imagen -->
             <TextView
                 android:id="@+id/toolbarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_marginStart="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/toolBarIco"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/language"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_language"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
-    <TextView
-        android:id="@+id/tvTituloLista"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLista"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/main_your_songs"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@color/texto_primario_dark"
-        android:layout_marginStart="16dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/topAppBar">
 
-    <!-- Contador de canciones -->
-    <TextView
-        android:id="@+id/tvContador"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textSize="14sp"
-        android:textColor="@color/texto_secundario_dark"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/tvTituloLista"
-        app:layout_constraintTop_toTopOf="@+id/tvTituloLista" />
+        <TextView
+            android:id="@+id/tvTituloLista"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/main_your_songs"
+            android:textColor="@color/texto_primario_dark"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvContador"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Lista de canciones (RecyclerView) -->
+        <TextView
+            android:id="@+id/tvContador"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/texto_secundario_dark"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvTituloLista"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTituloLista" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCanciones"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginVertical="8dp"
         android:paddingHorizontal="12dp"
-        android:clipToPadding="false"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloLista"
+        app:layout_constraintTop_toBottomOf="@+id/headerLista"
         app:layout_constraintBottom_toTopOf="@+id/playerBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_cancion" />
 
-    <!-- Barra inferior del reproductor (siempre visible) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/playerBar"
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:layout_margin="16dp"
+        app:cardBackgroundColor="@color/superficie_tarjeta"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@color/superficie_tarjeta"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="12dp">
 
-            <!-- Portada miniatura -->
             <ImageView
                 android:id="@+id/ivMiniPortada"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/ic_default_album_final"
-                android:scaleType="centerCrop"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize8" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Info canción -->
             <TextView
                 android:id="@+id/tvMiniTitulo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/main_no_song_selected"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/texto_primario_dark"
-                android:maxLines="1"
-                android:ellipsize="end"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp"
-                app:layout_constraintStart_toEndOf="@+id/ivMiniPortada"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/main_no_song_selected"
+                android:textColor="@color/texto_primario_dark"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/tvMiniArtista"
                 app:layout_constraintEnd_toStartOf="@+id/btnMiniPlay"
-                app:layout_constraintTop_toTopOf="@+id/ivMiniPortada"
-                app:layout_constraintBottom_toTopOf="@+id/tvMiniArtista" />
+                app:layout_constraintStart_toEndOf="@+id/ivMiniPortada"
+                app:layout_constraintTop_toTopOf="@+id/ivMiniPortada" />
 
             <TextView
                 android:id="@+id/tvMiniArtista"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:textSize="12sp"
-                android:textColor="@color/texto_secundario_dark"
-                android:maxLines="1"
-                android:ellipsize="end"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp"
-                app:layout_constraintStart_toEndOf="@+id/ivMiniPortada"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/app_name"
+                android:textColor="@color/texto_secundario_dark"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/ivMiniPortada"
                 app:layout_constraintEnd_toStartOf="@+id/btnMiniPlay"
-                app:layout_constraintTop_toBottomOf="@+id/tvMiniTitulo"
-                app:layout_constraintBottom_toBottomOf="@+id/ivMiniPortada" />
+                app:layout_constraintStart_toEndOf="@+id/ivMiniPortada"
+                app:layout_constraintTop_toBottomOf="@+id/tvMiniTitulo" />
 
-            <!-- Botón Play/Pause -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnMiniPlay"
+                style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:backgroundTint="@color/verde_brillante"
                 app:icon="@drawable/ic_play"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:backgroundTint="@color/verde_brillante"
                 app:iconTint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

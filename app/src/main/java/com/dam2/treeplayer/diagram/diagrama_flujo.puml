@@ -1,0 +1,20 @@
+@startuml
+title TreePlayer - Flujo de Datos
+
+MainActivity --> SongAdapter
+MainActivity --> PlayerManager
+MainActivity --> DeezerApiHelper
+
+SongAdapter --> FavoritesManager
+SongAdapter --> Song
+
+PlayerActivity --> PlayerManager
+PlayerActivity --> GeniusApiHelper
+
+PlayerManager --> Song
+
+FavoritesManager --> SharedPreferences
+DeezerApiHelper --> Song
+GeniusApiHelper --> PlayerActivity
+
+@enduml

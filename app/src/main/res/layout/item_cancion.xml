@@ -14,7 +14,6 @@
         android:layout_height="match_parent"
         android:padding="8dp">
 
-        <!-- Número de canción (índice) -->
         <TextView
             android:id="@+id/tvNumero"
             android:layout_width="32dp"
@@ -27,21 +26,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <!-- Portada del álbum (placeholder) -->
         <ImageView
             android:id="@+id/ivPortada"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_default_album_final"
             android:scaleType="centerCrop"
-            android:visibility="gone"
             android:layout_marginStart="8dp"
+            android:visibility="visible"
             app:layout_constraintStart_toEndOf="@+id/tvNumero"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize8" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-        <!-- Título de la canción -->
         <TextView
             android:id="@+id/tvTitulo"
             android:layout_width="0dp"
@@ -59,7 +55,6 @@
             app:layout_constraintTop_toTopOf="@+id/ivPortada"
             app:layout_constraintBottom_toTopOf="@+id/tvArtista" />
 
-        <!-- Artista -->
         <TextView
             android:id="@+id/tvArtista"
             android:layout_width="0dp"
@@ -76,31 +71,28 @@
             app:layout_constraintTop_toBottomOf="@+id/tvTitulo"
             app:layout_constraintBottom_toBottomOf="@+id/ivPortada" />
 
-        <!-- Duración -->
         <TextView
             android:id="@+id/tvDuracion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:text="3:45"
-            android:textSize="14sp"
             android:textColor="@color/texto_secundario_dark"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginEnd="12dp" />
+            app:layout_constraintEnd_toStartOf="@+id/ivFavorite"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
 
-        <!-- Botón de menú (3 puntos) -->
         <ImageView
-            android:id="@+id/ivMenu"
+            android:id="@+id/ivFavorite"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_more_vert"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="8dp"
-            app:tint="@color/texto_secundario_dark" />
+            android:src="@drawable/ic_favorite_border"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
